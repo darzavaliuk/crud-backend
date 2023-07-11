@@ -1,24 +1,22 @@
-const express = require('express')
-const dotenv = require('dotenv')
+import express from 'express'
+import dotenv from 'dotenv'
 const app = express();
-const jwt = require("jsonwebtoken")
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import {loginValidation, registerValidation} from "./validator.js";
+import register from "./controllers/UserController.js"
+import login from "./controllers/UserController.js";
 
-mongoose.connect("mongodb://localhost:27017")
+mongoose.connect("mongodb://127.0.0.1:27017/mern-app")
     .then(() => console.log("connect to db"))
     .catch(er => console.log(er))
 
 app.use(express.json())
-app.get("/", (req, res) => {
-    console.log("start")
-    res.send("Hello World")
-})
-app.post("/auth/login", (req, res) => {
-    console.log(req.body)
-    const token = jwt.sign(req.body, "12345678")
-    res.json({"success": "yes", "token": token})
-})
+
+// User route
+app.post("/auth/register", registerValidation, register)
+app.post("/auth/login", loginValidation, login)
 
 dotenv.config()
+
 const port = process.env.PORT || 3006;
 app.listen(port, () => console.log("Server is running on port: " + port))
